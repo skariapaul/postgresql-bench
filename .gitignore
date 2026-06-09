@@ -1,0 +1,4 @@
+results/*.log
+results/tpcc/*.log
+results/tpch/*.log
+*.tmp
