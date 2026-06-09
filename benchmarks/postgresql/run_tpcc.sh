@@ -16,10 +16,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HAMMERDB_DIR="${HAMMERDB_DIR:-/home/paskaria/HammerDB}"
 RESULTS_DIR="$SCRIPT_DIR/results/tpcc"
 LOG="$RESULTS_DIR/tpcc-$(date +%Y%m%d-%H%M%S).log"
+POWER_LOG="$RESULTS_DIR/power-$(date +%Y%m%d-%H%M%S).csv"
 TMPDIR_BENCH="$(mktemp -d /tmp/pg-bench-tpcc-XXXXXX)"
-trap 'rm -rf "$TMPDIR_BENCH"' EXIT
+trap 'power_monitor_stop; rm -rf "$TMPDIR_BENCH"' EXIT
 
 mkdir -p "$RESULTS_DIR"
+
+# ── Power monitoring ──────────────────────────────────────────────────────────
+source "$(dirname "${BASH_SOURCE[0]}")/lib/power_monitor.sh"
+POWER_METHOD=$(power_detect)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 clamp() { local v=$1 lo=$2 hi=$3; (( v < lo )) && v=$lo; (( v > hi )) && v=$hi; echo $v; }
@@ -195,6 +200,8 @@ printf "work_mem       : %d MB\n" "$WORK_MEM_MB"
 printf "Build VUs      : %d    Warehouses: %d\n" "$BUILD_VU" "$WAREHOUSES"
 printf "Run VUs        : %d\n" "$RUN_VU"
 printf "Log            : %s\n" "$LOG"
+printf "Power monitor  : %s\n" "$POWER_METHOD"
+[[ "$POWER_METHOD" != "none" ]] && printf "Power log      : %s\n" "$POWER_LOG"
 echo ""
 
 # ── Start container ───────────────────────────────────────────────────────────
@@ -219,16 +226,21 @@ echo "Ready."
 echo ""
 echo "[2/4] Building TPC-C schema (${WAREHOUSES} warehouses, ${BUILD_VU} VUs)..."
 cd "$HAMMERDB_DIR"
+power_monitor_start "build" "$POWER_LOG"
 TMP=/tmp ./hammerdbcli auto "$BUILD_TCL" 2>&1 | tee -a "$LOG"
+power_monitor_stop
 
 # ── Run benchmark ─────────────────────────────────────────────────────────────
 echo ""
 echo "[3/4] Running TPC-C (${RUN_VU} VUs, 2 min ramp + 10 min timed)..."
+power_monitor_start "run" "$POWER_LOG"
 TMP=/tmp ./hammerdbcli auto "$RUN_TCL" 2>&1 | tee -a "$LOG"
+power_monitor_stop
 
 # ── Results ───────────────────────────────────────────────────────────────────
 echo ""
 echo "[4/4] Complete. Log: $LOG"
 grep -oP 'System achieved.*' "$LOG" | tail -1 || echo "(see log for NOPM/TPM)"
+power_summary "$POWER_LOG"
 echo ""
 echo "=== TPC-C Complete ==="

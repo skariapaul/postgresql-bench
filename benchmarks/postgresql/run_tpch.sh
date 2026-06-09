@@ -26,10 +26,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HAMMERDB_DIR="${HAMMERDB_DIR:-/home/paskaria/HammerDB}"
 RESULTS_DIR="$SCRIPT_DIR/results/tpch"
 LOG="$RESULTS_DIR/tpch-${SF}-$(date +%Y%m%d-%H%M%S).log"
+POWER_LOG="$RESULTS_DIR/power-${SF}-$(date +%Y%m%d-%H%M%S).csv"
 TMPDIR_BENCH="$(mktemp -d /tmp/pg-bench-tpch-XXXXXX)"
-trap 'rm -rf "$TMPDIR_BENCH"' EXIT
+trap 'power_monitor_stop; rm -rf "$TMPDIR_BENCH"' EXIT
 
 mkdir -p "$RESULTS_DIR"
+
+# ── Power monitoring ──────────────────────────────────────────────────────────
+source "$(dirname "${BASH_SOURCE[0]}")/lib/power_monitor.sh"
+POWER_METHOD=$(power_detect)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 clamp() { local v=$1 lo=$2 hi=$3; (( v < lo )) && v=$lo; (( v > hi )) && v=$hi; echo $v; }
@@ -240,6 +245,8 @@ printf "Build threads    : %d\n" "$BUILD_THREADS"
 printf "Power test       : 1 VU, dop=%d\n" "$POWER_DOP"
 printf "Throughput test  : %d VUs, dop=%d\n" "$THRU_VU" "$THRU_DOP"
 printf "Log              : %s\n" "$LOG"
+printf "Power monitor    : %s\n" "$POWER_METHOD"
+[[ "$POWER_METHOD" != "none" ]] && printf "Power log        : %s\n" "$POWER_LOG"
 echo ""
 
 # ── Start container ───────────────────────────────────────────────────────────
@@ -264,21 +271,28 @@ echo "Ready."
 echo ""
 echo "[2/5] Building TPC-H schema ($SF, ${BUILD_THREADS} threads)..."
 cd "$HAMMERDB_DIR"
+power_monitor_start "build" "$POWER_LOG"
 TMP=/tmp ./hammerdbcli auto "$BUILD_TCL" 2>&1 | tee -a "$LOG"
+power_monitor_stop
 
 # ── Power test ────────────────────────────────────────────────────────────────
 echo ""
 echo "[3/5] Running power test (1 VU, dop=${POWER_DOP})..."
+power_monitor_start "power_test" "$POWER_LOG"
 TMP=/tmp ./hammerdbcli auto "$POWER_TCL" 2>&1 | tee -a "$LOG"
+power_monitor_stop
 
 # ── Throughput test ───────────────────────────────────────────────────────────
 echo ""
 echo "[4/5] Running throughput test (${THRU_VU} VUs, dop=${THRU_DOP})..."
+power_monitor_start "throughput_test" "$POWER_LOG"
 TMP=/tmp ./hammerdbcli auto "$THRU_TCL" 2>&1 | tee -a "$LOG"
+power_monitor_stop
 
 # ── Results ───────────────────────────────────────────────────────────────────
 echo ""
 echo "[5/5] Complete. Log: $LOG"
 echo "      Review the log for QphH = sqrt(Power × Throughput) metrics."
+power_summary "$POWER_LOG"
 echo ""
 echo "=== TPC-H ($SF) Complete ==="
