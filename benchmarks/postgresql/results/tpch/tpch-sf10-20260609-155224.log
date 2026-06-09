@@ -1,0 +1,434 @@
+HammerDB CLI v5.0
+Copyright © HammerDB Ltd hosted by tpc.org 2019-2025
+Type "help" for a list of commands
+Initialized Jobs on-disk database /tmp/hammer.DB using existing tables (6,574,080 bytes)
+Database set to PostgreSQL
+Benchmark set to TPC-H for PostgreSQL
+Value localhost for connection:pg_host is the same as existing value localhost, no change made
+Value 5432 for connection:pg_port is the same as existing value 5432, no change made
+Value prefer for connection:pg_sslmode is the same as existing value prefer, no change made
+Changed tpch:pg_scale_fact from 100 to 10 for PostgreSQL
+Changed tpch:pg_num_tpch_threads from 10 to 16 for PostgreSQL
+Value postgres for tpch:pg_tpch_superuser is the same as existing value postgres, no change made
+Value postgres for tpch:pg_tpch_superuserpass is the same as existing value postgres, no change made
+Value postgres for tpch:pg_tpch_defaultdbase is the same as existing value postgres, no change made
+Value tpch for tpch:pg_tpch_user is the same as existing value tpch, no change made
+Value tpch for tpch:pg_tpch_pass is the same as existing value tpch, no change made
+Value tpch for tpch:pg_tpch_dbase is the same as existing value tpch, no change made
+Value pg_default for tpch:pg_tpch_tspace is the same as existing value pg_default, no change made
+SCHEMA BUILD STARTED
+Script cleared
+Building Scale Factor 10 with 17 Virtual Users, 16 active + 1 Monitor VU(dict value pg_num_tpch_threads is set to 16)
+Ready to create a Scale Factor 10 TPROC-H schema
+ in host LOCALHOST:5432 sslmode PREFER under user TPCH in database TPCH?
+Enter yes or no: replied yes
+Vuser 1 created - WAIT IDLE
+Vuser 2 created - WAIT IDLE
+Vuser 3 created - WAIT IDLE
+Vuser 4 created - WAIT IDLE
+Vuser 5 created - WAIT IDLE
+Vuser 6 created - WAIT IDLE
+Vuser 7 created - WAIT IDLE
+Vuser 8 created - WAIT IDLE
+Vuser 9 created - WAIT IDLE
+Vuser 10 created - WAIT IDLE
+Vuser 11 created - WAIT IDLE
+Vuser 12 created - WAIT IDLE
+Vuser 13 created - WAIT IDLE
+Vuser 14 created - WAIT IDLE
+Vuser 15 created - WAIT IDLE
+Vuser 16 created - WAIT IDLE
+Vuser 17 created - WAIT IDLE
+Logging activated
+to /tmp/hammerdb.log
+Vuser 1:RUNNING
+Vuser 1:Monitor Thread
+Vuser 1:CREATING TPCH SCHEMA
+Vuser 1:CREATING DATABASE tpch under OWNER tpch
+Vuser 1:Using existing User tpch for Schema build
+Vuser 1:Database with tables tpch exists
+Error in Virtual User 1: Database tpch exists but is not empty, specify a new or empty database name
+Vuser 1:FINISHED FAILED
+Vuser 2:RUNNING
+Vuser 2:Worker Thread
+Vuser 2:Waiting for Monitor Thread...
+Vuser 3:RUNNING
+Vuser 3:Worker Thread
+Vuser 3:Waiting for Monitor Thread...
+Vuser 4:RUNNING
+Vuser 4:Worker Thread
+Vuser 4:Waiting for Monitor Thread...
+Vuser 5:RUNNING
+Vuser 5:Worker Thread
+Vuser 5:Waiting for Monitor Thread...
+Vuser 6:RUNNING
+Vuser 6:Worker Thread
+Vuser 6:Waiting for Monitor Thread...
+Vuser 7:RUNNING
+Vuser 7:Worker Thread
+Vuser 7:Waiting for Monitor Thread...
+Vuser 8:RUNNING
+Vuser 8:Worker Thread
+Vuser 8:Waiting for Monitor Thread...
+Vuser 9:RUNNING
+Vuser 9:Worker Thread
+Vuser 9:Waiting for Monitor Thread...
+Vuser 10:RUNNING
+Vuser 10:Worker Thread
+Vuser 10:Waiting for Monitor Thread...
+Vuser 11:RUNNING
+Vuser 11:Worker Thread
+Vuser 11:Waiting for Monitor Thread...
+Vuser 12:RUNNING
+Vuser 12:Worker Thread
+Vuser 12:Waiting for Monitor Thread...
+Vuser 13:RUNNING
+Vuser 13:Worker Thread
+Vuser 13:Waiting for Monitor Thread...
+Vuser 14:RUNNING
+Vuser 14:Worker Thread
+Vuser 14:Waiting for Monitor Thread...
+Vuser 15:RUNNING
+Vuser 15:Worker Thread
+Vuser 15:Waiting for Monitor Thread...
+Vuser 16:RUNNING
+Vuser 16:Worker Thread
+Vuser 16:Waiting for Monitor Thread...
+Vuser 17:RUNNING
+Vuser 17:Worker Thread
+Vuser 17:Waiting for Monitor Thread...
+Vuser 2:Monitor failed to notify ready state
+Vuser 2:FINISHED SUCCESS
+Vuser 3:Monitor failed to notify ready state
+Vuser 3:FINISHED SUCCESS
+Vuser 4:Monitor failed to notify ready state
+Vuser 4:FINISHED SUCCESS
+Vuser 5:Monitor failed to notify ready state
+Vuser 5:FINISHED SUCCESS
+Vuser 6:Monitor failed to notify ready state
+Vuser 6:FINISHED SUCCESS
+Vuser 7:Monitor failed to notify ready state
+Vuser 7:FINISHED SUCCESS
+Vuser 8:Monitor failed to notify ready state
+Vuser 8:FINISHED SUCCESS
+Vuser 9:Monitor failed to notify ready state
+Vuser 9:FINISHED SUCCESS
+Vuser 10:Monitor failed to notify ready state
+Vuser 10:FINISHED SUCCESS
+Vuser 11:Monitor failed to notify ready state
+Vuser 11:FINISHED SUCCESS
+Vuser 12:Monitor failed to notify ready state
+Vuser 12:FINISHED SUCCESS
+Vuser 13:Monitor failed to notify ready state
+Vuser 13:FINISHED SUCCESS
+Vuser 14:Monitor failed to notify ready state
+Vuser 14:FINISHED SUCCESS
+Vuser 15:Monitor failed to notify ready state
+Vuser 15:FINISHED SUCCESS
+Vuser 16:Monitor failed to notify ready state
+Vuser 16:FINISHED SUCCESS
+Vuser 17:Monitor failed to notify ready state
+Vuser 17:FINISHED SUCCESS
+ALL VIRTUAL USERS COMPLETE
+TPROC-H Driver Script
+SCHEMA BUILD COMPLETED
+HammerDB CLI v5.0
+Copyright © HammerDB Ltd hosted by tpc.org 2019-2025
+Type "help" for a list of commands
+Initialized Jobs on-disk database /tmp/hammer.DB using existing tables (6,582,272 bytes)
+Database set to PostgreSQL
+Benchmark set to TPC-H for PostgreSQL
+Value localhost for connection:pg_host is the same as existing value localhost, no change made
+Value 5432 for connection:pg_port is the same as existing value 5432, no change made
+Value prefer for connection:pg_sslmode is the same as existing value prefer, no change made
+Value 10 for tpch:pg_scale_fact is the same as existing value 10, no change made
+Value tpch for tpch:pg_tpch_user is the same as existing value tpch, no change made
+Value tpch for tpch:pg_tpch_pass is the same as existing value tpch, no change made
+Value tpch for tpch:pg_tpch_dbase is the same as existing value tpch, no change made
+Value 1 for tpch:pg_total_querysets is the same as existing value 1, no change made
+Changed tpch:pg_degree_of_parallel from 3 to 8 for PostgreSQL
+TPROC-H Driver Script
+Script loaded, Type "print script" to view
+TEST STARTED
+Vuser 1 created - WAIT IDLE
+Logging activated
+to /tmp/hammerdb.log
+1 Virtual Users Created
+Vuser 1:RUNNING
+Vuser 1:Verifying the scale factor of the existing schema...
+Vuser 1:Executing Query 14 (1 of 22)
+Vuser 1:query 14 completed in 12.237 seconds
+Vuser 1:Executing Query 2 (2 of 22)
+Vuser 1:query 2 completed in 7.873 seconds
+Vuser 1:Executing Query 9 (3 of 22)
+Vuser 1:query 9 completed in 8.882 seconds
+Vuser 1:Executing Query 20 (4 of 22)
+Vuser 1:query 20 completed in 3.447 seconds
+Vuser 1:Executing Query 6 (5 of 22)
+Vuser 1:query 6 completed in 0.667 seconds
+Vuser 1:Executing Query 17 (6 of 22)
+Vuser 1:query 17 completed in 8.484 seconds
+Vuser 1:Executing Query 18 (7 of 22)
+Vuser 1:query 18 completed in 12.674 seconds
+Vuser 1:Executing Query 8 (8 of 22)
+Vuser 1:query 8 completed in 1.386 seconds
+Vuser 1:Executing Query 21 (9 of 22)
+Vuser 1:query 21 completed in 1.796 seconds
+Vuser 1:Executing Query 13 (10 of 22)
+Vuser 1:query 13 completed in 11.833 seconds
+Vuser 1:Executing Query 3 (11 of 22)
+Vuser 1:query 3 completed in 1.827 seconds
+Vuser 1:Executing Query 22 (12 of 22)
+Vuser 1:query 22 completed in 0.265 seconds
+Vuser 1:Executing Query 16 (13 of 22)
+Vuser 1:query 16 completed in 1.136 seconds
+Vuser 1:Executing Query 4 (14 of 22)
+Vuser 1:query 4 completed in 0.623 seconds
+Vuser 1:Executing Query 11 (15 of 22)
+Vuser 1:query 11 completed in 0.577 seconds
+Vuser 1:Executing Query 15 (16 of 22)
+Vuser 1:query 15 completed in 4.565 seconds
+Vuser 1:Executing Query 1 (17 of 22)
+Vuser 1:query 1 completed in 3.53 seconds
+Vuser 1:Executing Query 10 (18 of 22)
+Vuser 1:query 10 completed in 1.355 seconds
+Vuser 1:Executing Query 19 (19 of 22)
+Vuser 1:query 19 completed in 0.207 seconds
+Vuser 1:Executing Query 5 (20 of 22)
+Vuser 1:query 5 completed in 1.822 seconds
+Vuser 1:Executing Query 7 (21 of 22)
+Vuser 1:query 7 completed in 1.402 seconds
+Vuser 1:Executing Query 12 (22 of 22)
+Vuser 1:query 12 completed in 1.351 seconds
+Vuser 1:Completed 1 query set(s) in 88 seconds
+Vuser 1:Geometric mean of query times returning rows (22) is 2.14327
+Vuser 1:FINISHED SUCCESS
+ALL VIRTUAL USERS COMPLETE
+TPROC-H Driver Script
+vudestroy success
+TEST COMPLETE
+HammerDB CLI v5.0
+Copyright © HammerDB Ltd hosted by tpc.org 2019-2025
+Type "help" for a list of commands
+Initialized Jobs on-disk database /tmp/hammer.DB using existing tables (6,590,464 bytes)
+Database set to PostgreSQL
+Benchmark set to TPC-H for PostgreSQL
+Value localhost for connection:pg_host is the same as existing value localhost, no change made
+Value 5432 for connection:pg_port is the same as existing value 5432, no change made
+Value prefer for connection:pg_sslmode is the same as existing value prefer, no change made
+Value 10 for tpch:pg_scale_fact is the same as existing value 10, no change made
+Value tpch for tpch:pg_tpch_user is the same as existing value tpch, no change made
+Value tpch for tpch:pg_tpch_pass is the same as existing value tpch, no change made
+Value tpch for tpch:pg_tpch_dbase is the same as existing value tpch, no change made
+Value 1 for tpch:pg_total_querysets is the same as existing value 1, no change made
+Changed tpch:pg_degree_of_parallel from 8 to 4 for PostgreSQL
+TPROC-H Driver Script
+Script loaded, Type "print script" to view
+TEST STARTED
+Vuser 1 created - WAIT IDLE
+Vuser 2 created - WAIT IDLE
+Vuser 3 created - WAIT IDLE
+Vuser 4 created - WAIT IDLE
+Logging activated
+to /tmp/hammerdb.log
+4 Virtual Users Created
+Vuser 1:RUNNING
+Vuser 1:Verifying the scale factor of the existing schema...
+Vuser 1:Executing Query 21 (1 of 22)
+Vuser 2:RUNNING
+Vuser 2:Verifying the scale factor of the existing schema...
+Vuser 2:Executing Query 6 (1 of 22)
+Vuser 3:RUNNING
+Vuser 3:Verifying the scale factor of the existing schema...
+Vuser 3:Executing Query 8 (1 of 22)
+Vuser 4:RUNNING
+Vuser 4:Verifying the scale factor of the existing schema...
+Vuser 4:Executing Query 5 (1 of 22)
+Vuser 2:query 6 completed in 1.083 seconds
+Vuser 2:Executing Query 17 (2 of 22)
+Vuser 3:query 8 completed in 1.073 seconds
+Vuser 3:Executing Query 5 (2 of 22)
+Vuser 1:query 21 completed in 2.866 seconds
+Vuser 1:Executing Query 3 (2 of 22)
+Vuser 4:query 5 completed in 2.174 seconds
+Vuser 4:Executing Query 21 (2 of 22)
+Vuser 3:query 5 completed in 2.041 seconds
+Vuser 3:Executing Query 4 (3 of 22)
+Vuser 3:query 4 completed in 0.813 seconds
+Vuser 3:Executing Query 6 (4 of 22)
+Vuser 1:query 3 completed in 2.601 seconds
+Vuser 1:Executing Query 18 (3 of 22)
+Vuser 3:query 6 completed in 1.009 seconds
+Vuser 3:Executing Query 17 (5 of 22)
+Vuser 4:query 21 completed in 2.77 seconds
+Vuser 4:Executing Query 14 (3 of 22)
+Vuser 2:query 17 completed in 9.275 seconds
+Vuser 2:Executing Query 14 (3 of 22)
+Vuser 3:query 17 completed in 9.391 seconds
+Vuser 3:Executing Query 7 (6 of 22)
+Vuser 3:query 7 completed in 2.711 seconds
+Vuser 3:Executing Query 1 (7 of 22)
+Vuser 4:query 14 completed in 12.804 seconds
+Vuser 4:Executing Query 19 (4 of 22)
+Vuser 4:query 19 completed in 0.213 seconds
+Vuser 4:Executing Query 15 (5 of 22)
+Vuser 1:query 18 completed in 15.442 seconds
+Vuser 1:Executing Query 5 (4 of 22)
+Vuser 1:query 5 completed in 2.519 seconds
+Vuser 1:Executing Query 11 (5 of 22)
+Vuser 2:query 14 completed in 12.718 seconds
+Vuser 2:Executing Query 16 (4 of 22)
+Vuser 3:query 1 completed in 5.946 seconds
+Vuser 3:Executing Query 18 (8 of 22)
+Vuser 1:query 11 completed in 0.775 seconds
+Vuser 1:Executing Query 7 (6 of 22)
+Vuser 2:query 16 completed in 1.313 seconds
+Vuser 2:Executing Query 19 (5 of 22)
+Vuser 2:query 19 completed in 0.296 seconds
+Vuser 2:Executing Query 10 (6 of 22)
+Vuser 2:query 10 completed in 1.722 seconds
+Vuser 2:Executing Query 9 (7 of 22)
+Vuser 4:query 15 completed in 7.459 seconds
+Vuser 4:Executing Query 17 (6 of 22)
+Vuser 1:query 7 completed in 2.819 seconds
+Vuser 1:Executing Query 6 (7 of 22)
+Vuser 1:query 6 completed in 1.038 seconds
+Vuser 1:Executing Query 20 (8 of 22)
+Vuser 2:query 9 completed in 5.187 seconds
+Vuser 2:Executing Query 2 (8 of 22)
+Vuser 1:query 20 completed in 4.34 seconds
+Vuser 1:Executing Query 17 (9 of 22)
+Vuser 2:query 2 completed in 2.298 seconds
+Vuser 2:Executing Query 15 (9 of 22)
+Vuser 4:query 17 completed in 8.782 seconds
+Vuser 4:Executing Query 12 (7 of 22)
+Vuser 4:query 12 completed in 2.001 seconds
+Vuser 4:Executing Query 6 (8 of 22)
+Vuser 4:query 6 completed in 0.98 seconds
+Vuser 4:Executing Query 4 (9 of 22)
+Vuser 3:query 18 completed in 15.151 seconds
+Vuser 3:Executing Query 22 (9 of 22)
+Vuser 3:query 22 completed in 0.293 seconds
+Vuser 3:Executing Query 14 (10 of 22)
+Vuser 4:query 4 completed in 0.826 seconds
+Vuser 4:Executing Query 9 (10 of 22)
+Vuser 2:query 15 completed in 5.71 seconds
+Vuser 2:Executing Query 8 (10 of 22)
+Vuser 2:query 8 completed in 0.933 seconds
+Vuser 2:Executing Query 5 (11 of 22)
+Vuser 1:query 17 completed in 9.852 seconds
+Vuser 1:Executing Query 12 (10 of 22)
+Vuser 2:query 5 completed in 2.51 seconds
+Vuser 2:Executing Query 22 (12 of 22)
+Vuser 2:query 22 completed in 0.352 seconds
+Vuser 2:Executing Query 12 (13 of 22)
+Vuser 1:query 12 completed in 2.424 seconds
+Vuser 1:Executing Query 16 (11 of 22)
+Vuser 4:query 9 completed in 5.206 seconds
+Vuser 4:Executing Query 8 (11 of 22)
+Vuser 4:query 8 completed in 1.084 seconds
+Vuser 4:Executing Query 16 (12 of 22)
+Vuser 2:query 12 completed in 2.236 seconds
+Vuser 2:Executing Query 7 (14 of 22)
+Vuser 1:query 16 completed in 1.472 seconds
+Vuser 1:Executing Query 15 (12 of 22)
+Vuser 4:query 16 completed in 1.648 seconds
+Vuser 4:Executing Query 11 (13 of 22)
+Vuser 4:query 11 completed in 0.664 seconds
+Vuser 4:Executing Query 2 (14 of 22)
+Vuser 2:query 7 completed in 2.76 seconds
+Vuser 2:Executing Query 13 (15 of 22)
+Vuser 4:query 2 completed in 2.328 seconds
+Vuser 4:Executing Query 10 (15 of 22)
+Vuser 4:query 10 completed in 1.399 seconds
+Vuser 4:Executing Query 18 (16 of 22)
+Vuser 3:query 14 completed in 12.959 seconds
+Vuser 3:Executing Query 9 (11 of 22)
+Vuser 1:query 15 completed in 7.275 seconds
+Vuser 1:Executing Query 13 (13 of 22)
+Vuser 3:query 9 completed in 5.257 seconds
+Vuser 3:Executing Query 10 (12 of 22)
+Vuser 3:query 10 completed in 1.409 seconds
+Vuser 3:Executing Query 15 (13 of 22)
+Vuser 2:query 13 completed in 14.369 seconds
+Vuser 2:Executing Query 18 (16 of 22)
+Vuser 3:query 15 completed in 6.092 seconds
+Vuser 3:Executing Query 11 (14 of 22)
+Vuser 3:query 11 completed in 0.679 seconds
+Vuser 3:Executing Query 20 (15 of 22)
+Vuser 4:query 18 completed in 14.816 seconds
+Vuser 4:Executing Query 1 (17 of 22)
+Vuser 1:query 13 completed in 13.392 seconds
+Vuser 1:Executing Query 10 (14 of 22)
+Vuser 1:query 10 completed in 1.406 seconds
+Vuser 1:Executing Query 2 (15 of 22)
+Vuser 3:query 20 completed in 3.782 seconds
+Vuser 3:Executing Query 2 (16 of 22)
+Vuser 1:query 2 completed in 2.325 seconds
+Vuser 1:Executing Query 8 (16 of 22)
+Vuser 1:query 8 completed in 0.915 seconds
+Vuser 1:Executing Query 14 (17 of 22)
+Vuser 4:query 1 completed in 5.668 seconds
+Vuser 4:Executing Query 13 (18 of 22)
+Vuser 3:query 2 completed in 2.784 seconds
+Vuser 3:Executing Query 21 (17 of 22)
+Vuser 3:query 21 completed in 2.772 seconds
+Vuser 3:Executing Query 19 (18 of 22)
+Vuser 3:query 19 completed in 0.211 seconds
+Vuser 3:Executing Query 13 (19 of 22)
+Vuser 2:query 18 completed in 15.119 seconds
+Vuser 2:Executing Query 1 (17 of 22)
+Vuser 1:query 14 completed in 12.383 seconds
+Vuser 1:Executing Query 19 (18 of 22)
+Vuser 2:query 1 completed in 5.592 seconds
+Vuser 2:Executing Query 4 (18 of 22)
+Vuser 1:query 19 completed in 0.219 seconds
+Vuser 1:Executing Query 9 (19 of 22)
+Vuser 2:query 4 completed in 0.836 seconds
+Vuser 2:Executing Query 20 (19 of 22)
+Vuser 4:query 13 completed in 13.564 seconds
+Vuser 4:Executing Query 7 (19 of 22)
+Vuser 4:query 7 completed in 2.505 seconds
+Vuser 4:Executing Query 22 (20 of 22)
+Vuser 4:query 22 completed in 0.27 seconds
+Vuser 4:Executing Query 3 (21 of 22)
+Vuser 2:query 20 completed in 3.887 seconds
+Vuser 2:Executing Query 3 (20 of 22)
+Vuser 3:query 13 completed in 13.432 seconds
+Vuser 3:Executing Query 16 (20 of 22)
+Vuser 1:query 9 completed in 5.184 seconds
+Vuser 1:Executing Query 22 (20 of 22)
+Vuser 1:query 22 completed in 0.387 seconds
+Vuser 1:Executing Query 1 (21 of 22)
+Vuser 3:query 16 completed in 1.611 seconds
+Vuser 3:Executing Query 12 (21 of 22)
+Vuser 4:query 3 completed in 2.691 seconds
+Vuser 4:Executing Query 20 (22 of 22)
+Vuser 2:query 3 completed in 2.801 seconds
+Vuser 2:Executing Query 11 (21 of 22)
+Vuser 2:query 11 completed in 0.653 seconds
+Vuser 2:Executing Query 21 (22 of 22)
+Vuser 3:query 12 completed in 2.257 seconds
+Vuser 3:Executing Query 3 (22 of 22)
+Vuser 2:query 21 completed in 2.748 seconds
+Vuser 2:Completed 1 query set(s) in 95 seconds
+Vuser 2:Geometric mean of query times returning rows (22) is 2.50373
+Vuser 2:FINISHED SUCCESS
+Vuser 3:query 3 completed in 2.557 seconds
+Vuser 4:query 20 completed in 3.885 seconds
+Vuser 3:Completed 1 query set(s) in 94 seconds
+Vuser 4:Completed 1 query set(s) in 94 seconds
+Vuser 3:Geometric mean of query times returning rows (22) is 2.45127
+Vuser 4:Geometric mean of query times returning rows (22) is 2.42171
+Vuser 3:FINISHED SUCCESS
+Vuser 4:FINISHED SUCCESS
+Vuser 1:query 1 completed in 5.81 seconds
+Vuser 1:Executing Query 4 (22 of 22)
+Vuser 1:query 4 completed in 0.812 seconds
+Vuser 1:Completed 1 query set(s) in 96 seconds
+Vuser 1:Geometric mean of query times returning rows (22) is 2.53176
+Vuser 1:FINISHED SUCCESS
+ALL VIRTUAL USERS COMPLETE
+TPROC-H Driver Script
+vudestroy success
+TEST COMPLETE
