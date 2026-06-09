@@ -58,7 +58,7 @@ export HAMMERDB_DIR=$PWD/HammerDB   # set this before running benchmarks
 
 ## NUMA Topology (AMD EPYC NPS4)
 
-With NPS4 the 64 physical cores are split across 4 NUMA nodes. Pinning the container to a single node eliminates cross-node memory latency and gives the most consistent results.
+With NPS4 the 64 physical cores are split across 4 NUMA nodes. Pinning the container's CPUs to a single node eliminates cross-node scheduler jitter and gives consistent results.
 
 ```
 Node 0: CPUs 0-15, 64-79   ← used for benchmarks (32 logical / 16 physical)
@@ -67,7 +67,22 @@ Node 2: CPUs 32-47, 96-111
 Node 3: CPUs 48-63, 112-127
 ```
 
-> **NPS1 users**: core numbering is identical; just drop `--cpuset-mems` from the docker run commands.
+> **Important:** the automated scripts use `--cpuset-cpus` only — **not** `--cpuset-mems`. Adding `--cpuset-mems 0` restricts all memory allocations to NUMA node 0's physical RAM (~94 GB on this system). With `shared_buffers = 100 GB`, the OOM killer will terminate PostgreSQL during checkpoint even when the system has hundreds of GB free on other nodes.
+
+---
+
+## Auto-scaling
+
+Both `run_tpcc.sh` and `run_tpch.sh` detect system resources at runtime and compute all tuning parameters automatically. No manual editing required.
+
+| What is detected | How it is used |
+|-----------------|----------------|
+| Total RAM (`/proc/meminfo`) | `shared_buffers` (25% for OLTP / 40% for OLAP), `work_mem`, `maintenance_work_mem` |
+| Logical CPUs (`nproc`) | VU counts, warehouse count, `max_parallel_workers`, `max_parallel_workers_per_gather` |
+| NUMA topology (`/sys/devices/system/node/`) | Auto-pins to NUMA node 0 when multiple nodes are detected; skips pinning on single-node or VM systems |
+| Free disk space | Warns before SF100 if < 200 GB available |
+
+The scripts print a full summary of computed parameters before starting. Generated `postgresql.conf` and TCL files are written to a temp directory and cleaned up on exit. The static files under `docker/` and `tcl/` remain useful as reference configs for manual runs on the reference system.
 
 ---
 
@@ -76,27 +91,30 @@ Node 3: CPUs 48-63, 112-127
 ### What it measures
 New Orders Per Minute (NOPM) — a mix of 5 transaction types (New Order, Payment, Order Status, Delivery, Stock Level). Higher is better.
 
-### Configuration
-| Parameter | Value |
-|-----------|-------|
-| Warehouses | 64 |
-| Build VUs | 8 |
-| Run VUs | 32 |
-| Ramp-up | 2 minutes |
-| Timed run | 10 minutes |
-| `shared_buffers` | 80 GB |
-| `synchronous_commit` | off |
-| `jit` | off |
+### Auto-scaled parameters (reference system: 377 GB RAM, 32 bench CPUs)
+| Parameter | Formula | Reference value |
+|-----------|---------|-----------------|
+| `shared_buffers` | 25% RAM, max 80 GB | 80 GB |
+| `work_mem` | 4 MB × RAM(GB), max 2 GB | 512 MB |
+| `synchronous_commit` | off (always) | off |
+| `jit` | off (always) | off |
+| Warehouses | 4 × run VUs, min 64 | 64 |
+| Build VUs | CPUs/8, min 4, max 16 | 4 |
+| Run VUs | CPUs/2, min 8, max 64 | 16 |
+| Ramp-up / Timed run | fixed | 2 min / 10 min |
 
-### Step-by-step
+### Quickstart
+```bash
+HAMMERDB_DIR=/path/to/HammerDB ./run_tpcc.sh
+```
+
+### Manual step-by-step
 
 **1. Start the container**
 ```bash
 docker rm -f pg-tpcc 2>/dev/null || true
 docker run -d \
   --name pg-tpcc \
-  --cpuset-cpus "0-15,64-79" \
-  --cpuset-mems 0 \
   --shm-size=4g \
   -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 \
@@ -108,6 +126,8 @@ docker run -d \
 until docker exec pg-tpcc pg_isready -U postgres -q; do sleep 2; done
 echo "Ready"
 ```
+
+> **NUMA pinning** (optional, multi-socket/NPS systems): add `--cpuset-cpus "0-15,64-79" --cpuset-mems 0` to pin to NUMA node 0. The automated script does this automatically when multiple NUMA nodes are detected.
 
 **2. Verify config**
 ```bash
@@ -132,11 +152,6 @@ HammerDB prints NOPM and TPM at the end of the run. Look for:
 Vuser 1:TEST RESULT : System achieved NNNN NOPM from NNNN PostgreSQL TPM
 ```
 
-**Or use the automated script:**
-```bash
-HAMMERDB_DIR=/path/to/HammerDB ./run_tpcc.sh
-```
-
 ### TPC-C Results
 
 | Run | VUs | Warehouses | NOPM | TPM |
@@ -151,32 +166,38 @@ HAMMERDB_DIR=/path/to/HammerDB ./run_tpcc.sh
 Query-per-hour H-Scoring (QphH) — 22 complex analytical queries over a large dataset. Higher is better.
 
 ### Scale factors
-| Scale | Raw data | Load time | Use case |
-|-------|----------|-----------|----------|
-| SF10  | ~10 GB   | 10-20 min | Validation / quick run |
-| SF100 | ~100 GB  | 1-2 hours | Production benchmark |
+| Scale | Raw data | Load time | Disk needed | Use case |
+|-------|----------|-----------|-------------|----------|
+| SF10  | ~10 GB   | 15-30 min | ~20 GB | Validation / quick run |
+| SF100 | ~100 GB  | 2-4 hours | ~200 GB | Production benchmark |
 
-### Configuration
-| Parameter | Value |
-|-----------|-------|
-| `shared_buffers` | 200 GB |
-| `work_mem` | 4 GB |
-| `jit` | on |
-| `autovacuum` | off |
-| `wal_level` | minimal |
-| Power test VUs | 1 (dop=8) |
-| Throughput test VUs | 5 (dop=3) |
+### Auto-scaled parameters (reference system: 377 GB RAM, 32 bench CPUs)
+| Parameter | Formula | Reference value |
+|-----------|---------|-----------------|
+| `shared_buffers` | 40% RAM | 150 GB |
+| `work_mem` | `(85%RAM − SB) / (thru_vus × (dop+1))`, max 8 GB | 8 GB |
+| `jit` | on (always) | on |
+| `autovacuum` | off (always) | off |
+| `wal_level` | minimal (always) | minimal |
+| Build threads | min(CPUs, 16) | 16 |
+| Power test dop | CPUs/4, max 16 | 8 |
+| Throughput VUs | CPUs/8, min 2, max 10 | 4 |
+| Throughput dop | CPUs/(VUs×2), max 8 | 4 |
 
-### Step-by-step
+### Quickstart
+```bash
+HAMMERDB_DIR=/path/to/HammerDB ./run_tpch.sh sf10    # validation
+HAMMERDB_DIR=/path/to/HammerDB ./run_tpch.sh sf100   # production benchmark
+```
+
+### Manual step-by-step
 
 **1. Start the container**
 ```bash
 docker rm -f pg-tpch 2>/dev/null || true
 docker run -d \
   --name pg-tpch \
-  --cpuset-cpus "0-15,64-79" \
-  --cpuset-mems 0 \
-  --shm-size=8g \
+  --shm-size=100g \
   -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 \
   -v pg-tpch-sf10-data:/var/lib/postgresql/data \
@@ -187,7 +208,9 @@ docker run -d \
 until docker exec pg-tpch pg_isready -U postgres -q; do sleep 2; done
 ```
 
-**2. Build schema** (SF10: 10-20 min / SF100: 1-2 hours)
+> **NUMA pinning** (optional): add `--cpuset-cpus "0-15,64-79" --cpuset-mems 0` for NPS4/multi-socket systems. Adjust `--shm-size` to match `shared_buffers`.
+
+**2. Build schema** (SF10: 15-30 min / SF100: 2-4 hours)
 ```bash
 # SF10 (validation)
 TMP=/tmp ./hammerdbcli auto /path/to/postgresql-bench/tcl/tpch/tpch_build_sf10.tcl 2>&1 | tee tpch_build_sf10.log
@@ -201,27 +224,45 @@ TMP=/tmp ./hammerdbcli auto /path/to/postgresql-bench/tcl/tpch/tpch_build_sf100.
 TMP=/tmp ./hammerdbcli auto /path/to/postgresql-bench/tcl/tpch/tpch_power_sf10.tcl 2>&1 | tee tpch_power_sf10.log
 ```
 
-**4. Throughput test** (5 VUs concurrently)
+**4. Throughput test** (multiple VUs concurrently)
 ```bash
 TMP=/tmp ./hammerdbcli auto /path/to/postgresql-bench/tcl/tpch/tpch_throughput_sf10.tcl 2>&1 | tee tpch_throughput_sf10.log
 ```
 
-**Or use the automated script:**
-```bash
-HAMMERDB_DIR=/path/to/HammerDB ./run_tpch.sh sf10    # validation
-HAMMERDB_DIR=/path/to/HammerDB ./run_tpch.sh sf100   # production
-```
-
 ### TPC-H Results
 
-PostgreSQL 17, NPS4 node0 (CPUs 0-15,64-79), `shared_buffers=200GB`, `work_mem=4GB`, `jit=on`
+PostgreSQL 17, NPS4 node0 CPUs (0-15,64-79), `shared_buffers=100GB`, `work_mem=4GB`, `jit=on`
 
 | Scale | Test | Queries | Total Time | Geo Mean Query Time | Notes |
 |-------|------|---------|------------|---------------------|-------|
-| SF10  | Power | 22 | 78 s | 1.88 s | 1 VU, dop=8 |
-| SF10  | Throughput | 22×5 VUs | ~105 s | 2.75 s | 5 VUs, dop=3 |
-| SF100 | Power | — | — | — | Run `./run_tpch.sh sf100` (needs ~150 GB disk, ~1-2 h load) |
-| SF100 | Throughput | — | — | — | Run `./run_tpch.sh sf100` after power test |
+| SF10  | Power      | 22      | 78 s     | 1.88 s  | 1 VU, dop=8 |
+| SF10  | Throughput | 22×5    | ~105 s   | 2.75 s  | 5 VUs, dop=3 |
+| SF100 | Power      | 22      | 879 s    | 23.4 s  | 1 VU, dop=8 — Power@SF100 = **15,375** |
+| SF100 | Throughput | 22×5    | 1,631 s  | 42.9 s  | 5 VUs, dop=3 — Throughput@SF100 = **24,280** |
+
+**QphH@SF100 = √(15,375 × 24,280) = 19,321**
+
+#### SF100 Power test — per-query times
+
+| Query | Time (s) | Query | Time (s) | Query | Time (s) |
+|-------|----------|-------|----------|-------|----------|
+| Q1  | 33.2  | Q9  | 50.1  | Q17 | 102.6 |
+| Q2  | 28.8  | Q10 | 32.7  | Q18 | 92.6  |
+| Q3  | 36.1  | Q11 | 7.1   | Q19 | 2.1   |
+| Q4  | 6.5   | Q12 | 12.0  | Q20 | 53.9  |
+| Q5  | 18.8  | Q13 | 138.2 | Q21 | 20.5  |
+| Q6  | 7.4   | Q14 | 117.8 | Q22 | 2.1   |
+| Q7  | 14.0  | Q15 | 47.2  |     |       |
+| Q8  | 15.7  | Q16 | 39.9  |     |       |
+
+#### Comparison with Viettel PoC reference
+
+| System | CPU | QphH@SF100 |
+|--------|-----|------------|
+| This run | AMD EPYC 9555P (1S, NPS4 node0, 32 logical CPUs) | **19,321** |
+| Viettel PoC reference | AMD EPYC 9454 | 14,644 |
+
+The EPYC 9555P result is **32% higher** than the Viettel PoC reference on the EPYC 9454.
 
 ---
 
@@ -262,7 +303,7 @@ Each transaction waits for WAL to flush before acknowledging the client. Disabli
 JIT compilation adds latency for short OLTP transactions — the compilation overhead exceeds the execution savings. For TPC-H (long-running analytical queries), JIT is enabled.
 
 ### Why large `shared_buffers` for TPC-H?
-With SF100, the working set is ~100+ GB. Having `shared_buffers = 200GB` means most of the dataset fits in the buffer pool after the first scan, eliminating repeated disk I/O.
+With SF100, the working set is ~100+ GB. Setting `shared_buffers` to 40% of RAM means most of the dataset fits in the buffer pool after the first scan, eliminating repeated disk I/O. The automated script caps this at a level that leaves enough room for `work_mem × parallel streams` to avoid OOM.
 
 ### Why `--cpuset-mems 0`?
 On NPS4, each NUMA node has its own memory controller. Without this flag, PostgreSQL will allocate memory from all 4 nodes, causing cross-NUMA memory access latency (~12 cycles vs ~10 cycles local). Pinning memory to node0 ensures all allocations are local to the CPUs we're using.

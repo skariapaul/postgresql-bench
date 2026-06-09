@@ -10,7 +10,7 @@ AMD EPYC 9555P — 64 cores / 128 threads, single socket, NPS4, 377 GiB DDR5, 46
 
 | Directory | Database | Workloads | Latest results |
 |-----------|----------|-----------|----------------|
-| [postgresql/](benchmarks/postgresql/) | PostgreSQL 17 | TPC-C (OLTP), TPC-H (OLAP) SF10 & SF100 | 973,227 NOPM · QphH SF100 in progress |
+| [postgresql/](benchmarks/postgresql/) | PostgreSQL 17 | TPC-C (OLTP), TPC-H (OLAP) SF10 & SF100 | TPC-C: **973,227 NOPM** · TPC-H SF100: **QphH 19,321** |
 
 ## Adding a benchmark
 
