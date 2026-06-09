@@ -266,6 +266,47 @@ The EPYC 9555P result is **32% higher** than the Viettel PoC reference on the EP
 
 ---
 
+## Intel Xeon Comparison
+
+### TPC-C (OLTP)
+
+No vendor-neutral public HammerDB NOPM results for bare-metal Xeon + PostgreSQL exist. The best available data is AMD's February 2024 performance brief comparing single-socket EPYC 9374F against dual-socket Xeon Platinum 8462Y+:
+
+| System | CPU | Sockets | Cores | PostgreSQL NOPM | vs EPYC 9374F |
+|--------|-----|---------|-------|-----------------|---------------|
+| AMD (1P) | EPYC 9374F (Genoa, 32C, 3.85 GHz) | 1 | 32 | baseline + **58%** | — |
+| Intel (2P) | 2× Xeon Platinum 8462Y+ (SPR, 32C each) | 2 | 64 total | baseline | −37% |
+| **This run** | **EPYC 9555P (32 bench CPUs, NPS4 node0)** | **1** | **32 logical** | **973,227** | — |
+
+> **Source:** [AMD EPYC 9374F PostgreSQL Performance Brief](https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/performance-briefs/amd-epyc-9004-pb-postgresql.pdf), Feb 2024. AMD-authored; treat relative numbers with appropriate scepticism. Absolute NOPM not published.
+
+**Intel scalability caveat:** Intel engineers submitted an RFC to the PostgreSQL mailing list (2024) documenting a *scalability collapse* on high-core-count Xeon systems — NOPM regresses as virtual-user count increases past ~64–96 VUs on 384-vCPU machines. This is a PostgreSQL-level lock contention issue that disproportionately affects high-core-count single-NUMA-domain configurations. See: [PostgreSQL RFC — Enhance scalability of TPCC on HCC systems](https://www.postgresql.org/message-id/e241f2c1-e2e2-41b3-a9d9-dbe9589643e0@intel.com).
+
+### TPC-H (OLAP)
+
+**No public TPC-H SF100 QphH result exists for any Intel Xeon + PostgreSQL.** The official TPC-H certified results use commercial databases (SQL Server, Oracle) at SF1000+ — a 10× larger scale and incomparable workload. The Viettel PoC and this run are the only published PostgreSQL + HammerDB SF100 QphH numbers found in an exhaustive search.
+
+For reference, the latest official TPC-H certified results (SF1000, commercial DB):
+
+| Hardware | Database | QphH@SF1000 | Date |
+|----------|----------|-------------|------|
+| HPE ProLiant DL345 Gen11 (EPYC 9375F) | SQL Server 2022 Enterprise | 1,531,016 | Oct 2025 |
+| HPE ProLiant DL380 Gen12 | SQL Server 2022 Enterprise | 1,184,211 | Jun 2025 |
+
+> These results are at SF1000 (1 TB) with a commercial database. They are **not comparable** to SF100 PostgreSQL results. They are listed only to show what Intel hardware appears (or does not appear) in the official leaderboard — AMD EPYC currently occupies the top spots.
+
+### Current-gen Intel Xeon reference specs
+
+| Processor | Codename | Cores | Base / Boost | Memory channels | Notes |
+|-----------|----------|-------|-------------|-----------------|-------|
+| Xeon Platinum 8592+ | Emerald Rapids (5th gen) | 64C / 128T | 1.9 / 3.9 GHz | 8ch DDR5-5600 | 23.5% faster than prior Xeon 8490H |
+| Xeon 6980P | Granite Rapids (6th gen) | 128C / 256T | 2.0 / 3.8 GHz | 8ch DDR5-6400 | 899,976 pgbench TPS (OpenBenchmarking); no HammerDB result published |
+| Xeon 6766E | Sierra Forest (6th gen, E-core) | 144C | efficiency | 8ch | No database benchmarks published |
+
+The EPYC 9555P (64C, 3.1/4.1 GHz, 12ch DDR5) has meaningfully higher memory bandwidth than any single-socket Xeon, which is the primary driver of TPC-H query performance.
+
+---
+
 ## Repository Structure
 
 ```

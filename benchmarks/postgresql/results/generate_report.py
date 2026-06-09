@@ -407,6 +407,112 @@ t = Table(rows, colWidths=[4.5*cm, 2*cm, 10*cm])
 t.setStyle(tbl_style(1))
 story += [t, Spacer(1, 4*mm)]
 
+# ── Intel Xeon Comparison ──────────────────────────────────────────────────────
+story += section("Intel Xeon Comparison")
+
+story.append(Paragraph("<b>TPC-C (OLTP)</b>", H2))
+story.append(Paragraph(
+    "No vendor-neutral public HammerDB NOPM results exist for bare-metal Xeon + PostgreSQL. "
+    "The best available data is AMD's February 2024 performance brief comparing "
+    "single-socket EPYC 9374F against dual-socket Xeon Platinum 8462Y+. "
+    "Absolute NOPM values were not published — only the relative advantage.", BODY))
+
+tpcc_intel_data = [
+    [Paragraph(h, CELL_H) for h in ["System", "CPU", "Sockets", "Cores", "NOPM", "vs Xeon baseline"]],
+    [Paragraph("Intel (2P)", CELL_L),
+     Paragraph("2× Xeon Platinum 8462Y+\n(Sapphire Rapids)", CELL_L),
+     "2", "64 total", "—", "baseline"],
+    [Paragraph("AMD (1P)", CELL_L),
+     Paragraph("EPYC 9374F\n(Genoa, 32C, 3.85 GHz)", CELL_L),
+     "1", "32",
+     Paragraph("<b>baseline +58%</b>", CELL),
+     Paragraph("<b>+58%</b>", S("Normal", fontSize=8.5, textColor=C_GREEN,
+                                 fontName="Helvetica-Bold", alignment=TA_CENTER))],
+    [Paragraph("<b>This run</b>", CELL_L),
+     Paragraph("<b>EPYC 9555P</b>\n(32 bench CPUs, NPS4 node0)", CELL_L),
+     "1", "32 logical",
+     Paragraph("<b>973,227</b>", CELL),
+     Paragraph("newer gen than 9374F", CELL)],
+]
+t = Table([[Paragraph(str(c), CELL) if not isinstance(c, Paragraph) else c for c in row]
+           if i > 0 else row for i, row in enumerate(tpcc_intel_data)],
+          colWidths=[2.5*cm, 4.5*cm, 1.5*cm, 2*cm, 2.5*cm, 3.5*cm])
+t.setStyle(tbl_style(1))
+t.setStyle(TableStyle([
+    ("BACKGROUND", (0, 3), (-1, 3), C_GREEN_LITE),
+    ("FONTNAME",   (0, 3), (0, 3), "Helvetica-Bold"),
+]))
+story += [t, Spacer(1, 2*mm)]
+story.append(Paragraph(
+    "Source: AMD EPYC 9374F PostgreSQL Performance Brief, Feb 2024. AMD-authored — treat relative "
+    "numbers with appropriate scepticism. Note: Intel engineers have reported a PostgreSQL "
+    "scalability collapse on high-core-count Xeon systems (NOPM regresses past ~64–96 VUs on "
+    "384-vCPU machines) — an open issue in upstream PostgreSQL.", SMALL))
+
+story += [Spacer(1, 4*mm), Paragraph("<b>TPC-H (OLAP)</b>", H2)]
+story.append(Paragraph(
+    "No public TPC-H SF100 QphH result exists for any Intel Xeon + PostgreSQL combination. "
+    "The official TPC-H certified leaderboard uses commercial databases (SQL Server, Oracle) "
+    "at SF1000 (1 TB minimum) — a 10× larger scale that is not comparable to SF100 PostgreSQL results. "
+    "The Viettel PoC and this run are the only published PostgreSQL + HammerDB SF100 QphH numbers found.", BODY))
+
+tpch_intel_data = [
+    [Paragraph(h, CELL_H) for h in ["System", "CPU", "Database", "Scale", "QphH", "Note"]],
+    [Paragraph("<b>This run</b>", CELL_L), "EPYC 9555P",
+     "PostgreSQL 17", "SF100",
+     Paragraph("<b>19,321</b>", CELL), "HammerDB (informal)"],
+    ["Viettel PoC", "EPYC 9454",
+     "PostgreSQL", "SF100",
+     "14,644", "HammerDB (informal)"],
+    [Paragraph("HPE DL345 Gen11", CELL_L), "EPYC 9375F",
+     "SQL Server 2022", "SF1000",
+     "1,531,016",
+     Paragraph("Official TPC-H — not comparable", S("Normal", fontSize=7.5,
+               textColor=C_GREY, alignment=TA_CENTER, leading=11))],
+    [Paragraph("HPE DL380 Gen12", CELL_L), "Intel (unspecified)",
+     "SQL Server 2022", "SF1000",
+     "1,184,211",
+     Paragraph("Official TPC-H — not comparable", S("Normal", fontSize=7.5,
+               textColor=C_GREY, alignment=TA_CENTER, leading=11))],
+]
+t = Table([[Paragraph(str(c), CELL) if not isinstance(c, Paragraph) else c for c in row]
+           if i > 0 else row for i, row in enumerate(tpch_intel_data)],
+          colWidths=[3*cm, 3*cm, 2.8*cm, 1.5*cm, 2.2*cm, 4*cm])
+t.setStyle(tbl_style(1))
+t.setStyle(TableStyle([
+    ("BACKGROUND", (0, 1), (-1, 1), C_GREEN_LITE),
+    ("TEXTCOLOR",  (0, 3), (-1, 4), C_GREY),
+    ("FONTSIZE",   (0, 3), (-1, 4), 8),
+]))
+story += [t, Spacer(1, 2*mm)]
+story.append(Paragraph(
+    "Official TPC-H results use commercial databases at ≥SF1000. Intel hardware does not appear "
+    "at the top of the leaderboard — AMD EPYC holds the top certified positions as of mid-2025.", SMALL))
+
+story += [Spacer(1, 4*mm), Paragraph("<b>Current-gen Intel Xeon reference specs</b>", H2)]
+
+xeon_data = [
+    [Paragraph(h, CELL_H) for h in ["Processor", "Codename", "Cores", "Base/Boost", "Mem BW", "Notes"]],
+    ["Xeon Platinum 8592+", "Emerald Rapids (5th gen)", "64C / 128T", "1.9 / 3.9 GHz",
+     "8ch DDR5-5600", "23.5% faster than prior Xeon 8490H"],
+    ["Xeon 6980P", "Granite Rapids (6th gen)", "128C / 256T", "2.0 / 3.8 GHz",
+     "8ch DDR5-6400", "899,976 pgbench TPS (OpenBenchmarking); no HammerDB result"],
+    [Paragraph("<b>EPYC 9555P</b>\n(this system)", CELL_L),
+     Paragraph("<b>Turin (Zen 5)</b>", CELL_L),
+     "64C / 128T", "3.1 / 4.1 GHz",
+     Paragraph("<b>12ch DDR5-6400</b>", CELL),
+     Paragraph("Higher mem BW = primary TPC-H advantage", CELL)],
+]
+t = Table([[Paragraph(str(c), CELL) if not isinstance(c, Paragraph) else c for c in row]
+           if i > 0 else row for i, row in enumerate(xeon_data)],
+          colWidths=[3.5*cm, 3.5*cm, 2*cm, 2.5*cm, 2.5*cm, 2.5*cm])
+t.setStyle(tbl_style(1))
+t.setStyle(TableStyle([
+    ("BACKGROUND", (0, 3), (-1, 3), C_GREEN_LITE),
+    ("FONTNAME",   (0, 3), (1, 3), "Helvetica-Bold"),
+]))
+story += [t, Spacer(1, 4*mm)]
+
 # ── Repo & reproducibility ─────────────────────────────────────────────────────
 story += section("Reproducing These Results")
 story.append(Paragraph(
@@ -448,7 +554,7 @@ story += [
     Paragraph(
         "This is an informal benchmark for hardware evaluation purposes. "
         "Results are not TPC-audited. All configurations, logs, and scripts "
-        f"are publicly available. Report generated {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}.",
+        f"are publicly available. Report generated {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}.",
         SMALL),
 ]
 
