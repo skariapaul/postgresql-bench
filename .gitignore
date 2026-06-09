@@ -1,4 +1,3 @@
-results/*.log
-results/tpcc/*.log
-results/tpch/*.log
+**/results/*.log
+**/results/**/*.log
 *.tmp
